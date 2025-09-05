@@ -415,10 +415,10 @@
                                     <label class="block text-gray-700 font-medium mb-2">PIN de Acesso</label>
                                     <input type="password" id="config-pin" maxlength="6" class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
                                 </div>
-                                <div>
-                                    <label class="block text-gray-700 font-medium mb-2">URL GitHub Pages (Opcional)</label>
-                                    <input type="url" id="config-github" placeholder="https://usuario.github.io/repositorio" class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
-                                    <p class="text-xs text-gray-500 mt-1">Para sincronização automática dos dados</p>
+                                <div class="bg-green-50 p-3 rounded-lg">
+                                    <label class="block text-gray-700 font-medium mb-2">🌐 GitHub Pages URL</label>
+                                    <p class="text-sm text-green-700 font-mono bg-white p-2 rounded border">https://rodrigosilicani54-beep.github.io/Studio-Jeni-Silicani/</p>
+                                    <p class="text-xs text-gray-600 mt-1">✅ URL configurada permanentemente</p>
                                 </div>
                             </div>
                         </div>
@@ -626,7 +626,7 @@
                 cancelamento: 'Oi {nome}, não conseguimos confirmar seu horário {data} {hora}. Vamos achar outro?',
                 recibo: '{nome}, segue seu Recibo Digital: {itens}, total R$ {total} em {pagamento}. Obrigado por escolher o Studio 🙌'
             },
-            githubUrl: ''
+            githubUrl: 'https://rodrigosilicani54-beep.github.io/Studio-Jeni-Silicani/'
         };
 
         // Initialize
@@ -1476,7 +1476,6 @@ Obrigado pela preferência! 💅✨
             
             // Load other configs
             document.getElementById('config-pin').value = ADMIN_PIN;
-            document.getElementById('config-github').value = config.githubUrl;
         }
 
         function loadConfigurationsUI() {
@@ -1539,8 +1538,7 @@ Obrigado pela preferência! 💅✨
             // Save PIN
             ADMIN_PIN = document.getElementById('config-pin').value;
             
-            // Save GitHub URL
-            config.githubUrl = document.getElementById('config-github').value;
+            // GitHub URL is permanently set
             
             // Save horários
             const horarioInputs = document.querySelectorAll('#horarios-funcionamento input');
@@ -1715,5 +1713,5 @@ Obrigado pela preferência! 💅✨
             document.getElementById('success-modal').classList.remove('active');
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a6692d55bdc1b6',t:'MTc1NzA4MjQ4Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a68102429fc1b6',t:'MTc1NzA4MzQ1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
