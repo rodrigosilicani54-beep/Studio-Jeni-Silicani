@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studio de Beleza Jeni $ilicani</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
@@ -355,13 +356,13 @@
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-4">
-                            <button type="button" onclick="gerarPDFRecibo()" class="btn-primary text-white py-3 px-4 rounded-xl font-semibold">
-                                📄 Gerar PDF
+                        <div class="space-y-3">
+                            <button type="button" onclick="gerarPDFRecibo()" class="w-full btn-primary text-white py-4 px-6 rounded-xl font-semibold text-lg">
+                                📄 Gerar PDF + Enviar WhatsApp
                             </button>
-                            <button type="button" onclick="enviarReciboWhats()" class="bg-green-500 text-white py-3 px-4 rounded-xl font-semibold hover:bg-green-600 transition-colors">
-                                📱 Enviar WhatsApp
-                            </button>
+                            <p class="text-xs text-gray-500 text-center">
+                                ✨ O PDF será gerado automaticamente e o WhatsApp abrirá para envio
+                            </p>
                         </div>
                     </form>
                 </div>
@@ -1616,40 +1617,78 @@ Status: ${agendamento.status === 'pendente' ? '⏳ PENDENTE DE CONFIRMAÇÃO' : 
             cupomCounter++;
             saveToStorage();
             
-            // Generate PDF content (simplified)
-            const pdfContent = `
-STUDIO DE BELEZA JENI $ILICANI
-Rua das Graviolas N°350
-(11) 94510-6374
-
-RECIBO DIGITAL
-Número: ${numero}
-
-Cliente: ${cliente}
-Data: ${formatDate(data)}
-Profissional: ${profissional}
-
-SERVIÇOS:
-${servicos.map(s => `${s.nome} - R$ ${s.valor.toFixed(2)}`).join('\n')}
-
-TOTAL: ${total}
-Pagamento: ${pagamento}
-
-${observacoes ? `Observações: ${observacoes}` : ''}
-
-Obrigado pela preferência! 💅✨
-            `;
+            // Generate PDF using jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
             
-            // Create and download PDF (simplified as text file)
-            const blob = new Blob([pdfContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
+            // Header
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('STUDIO DE BELEZA JENI $ILICANI', 105, 20, { align: 'center' });
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Rua das Graviolas N°350', 105, 28, { align: 'center' });
+            doc.text('(11) 94510-6374', 105, 34, { align: 'center' });
+            
+            // Recibo info
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.text('RECIBO DIGITAL', 105, 50, { align: 'center' });
+            
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Número: ${numero}`, 20, 65);
+            doc.text(`Data: ${formatDate(data)}`, 20, 75);
+            doc.text(`Cliente: ${cliente}`, 20, 85);
+            doc.text(`Profissional: ${profissional}`, 20, 95);
+            
+            // Services
+            doc.setFont(undefined, 'bold');
+            doc.text('SERVIÇOS:', 20, 110);
+            
+            doc.setFont(undefined, 'normal');
+            let yPos = 120;
+            servicos.forEach(servico => {
+                doc.text(`${servico.nome}`, 25, yPos);
+                doc.text(`R$ ${servico.valor.toFixed(2)}`, 150, yPos);
+                yPos += 10;
+            });
+            
+            // Total
+            doc.setFont(undefined, 'bold');
+            doc.text('TOTAL:', 25, yPos + 10);
+            doc.text(total, 150, yPos + 10);
+            
+            // Payment
+            doc.setFont(undefined, 'normal');
+            doc.text(`Forma de Pagamento: ${pagamento}`, 20, yPos + 25);
+            
+            // Observations
+            if (observacoes) {
+                doc.text(`Observações: ${observacoes}`, 20, yPos + 35);
+            }
+            
+            // Footer
+            doc.text('Obrigado pela preferência! 💅✨', 105, yPos + 50, { align: 'center' });
+            
+            // Generate PDF blob
+            const pdfBlob = doc.output('blob');
+            
+            // Create download link
+            const url = URL.createObjectURL(pdfBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Recibo-${numero}.txt`;
+            a.download = `Recibo-${numero}.pdf`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            
+            // Auto send via WhatsApp after PDF generation
+            setTimeout(() => {
+                enviarReciboWhatsComPDF(cupom);
+            }, 1000);
             
             // Reset form
             document.getElementById('cupom-form').reset();
@@ -1657,7 +1696,43 @@ Obrigado pela preferência! 💅✨
             updateCupomNumber();
             updateCupomTotal();
             
-            alert('Recibo gerado com sucesso!');
+            alert('PDF gerado e enviando via WhatsApp...');
+        }
+
+        function enviarReciboWhatsComPDF(cupom) {
+            // Get client phone from agendamentos
+            const clienteAgendamento = agendamentos.find(a => a.nome === cupom.cliente);
+            if (!clienteAgendamento) {
+                alert('Telefone do cliente não encontrado');
+                return;
+            }
+            
+            const servicosTexto = cupom.servicos.map(s => `${s.nome} R$ ${s.valor.toFixed(2)}`).join(', ');
+            
+            const message = `🧾 *RECIBO DIGITAL - STUDIO JENI $ILICANI*
+
+👤 Cliente: ${cupom.cliente}
+📅 Data: ${formatDate(cupom.data)}
+👩‍💼 Profissional: ${cupom.profissional}
+📋 Número: ${cupom.numero}
+
+💅 *SERVIÇOS REALIZADOS:*
+${servicosTexto}
+
+💰 *TOTAL: R$ ${cupom.total.toFixed(2)}*
+💳 Pagamento: ${cupom.pagamento}
+
+${cupom.observacoes ? `📝 Obs: ${cupom.observacoes}` : ''}
+
+✨ Obrigado por escolher nosso studio!
+📍 Rua das Graviolas N°350
+
+_O PDF do recibo foi baixado no seu dispositivo_`;
+            
+            const whatsappUrl = `https://wa.me/55${clienteAgendamento.telefone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+            
+            // Mobile optimized - direct redirect
+            window.location.href = whatsappUrl;
         }
 
         function enviarReciboWhats() {
@@ -1701,7 +1776,9 @@ Obrigado pela preferência! 💅✨
                 .replace('{pagamento}', pagamento);
             
             const whatsappUrl = `https://wa.me/55${clienteAgendamento.telefone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
+            
+            // Mobile optimized - direct redirect
+            window.location.href = whatsappUrl;
         }
 
         // Configuration Functions
@@ -1951,5 +2028,5 @@ Obrigado pela preferência! 💅✨
             document.getElementById('success-modal').classList.remove('active');
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a6ee1e7799f1c7',t:'MTc1NzA4NzkyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a6fe65905bc1b6',t:'MTc1NzA4ODU5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
