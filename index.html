@@ -1175,6 +1175,32 @@
             });
         }
 
+        // Studio Notification Function
+        function enviarNotificacaoStudio(agendamento) {
+            const studioPhone = '5511945106374'; // Studio WhatsApp number
+            
+            const message = `🔔 NOVO AGENDAMENTO RECEBIDO!
+
+👤 Cliente: ${agendamento.nome}
+📱 Telefone: ${agendamento.telefone}
+💅 Serviço: ${agendamento.servicoNome}
+📅 Data: ${formatDate(agendamento.data)}
+🕐 Horário: ${agendamento.horario}
+👩‍💼 Profissional: ${agendamento.profissional}
+${agendamento.observacoes ? `📝 Obs: ${agendamento.observacoes}` : ''}
+
+Status: ${agendamento.status === 'pendente' ? '⏳ PENDENTE DE CONFIRMAÇÃO' : '📝 LISTA DE ESPERA'}
+
+⚠️ Confirme ou cancele este agendamento no painel admin!`;
+
+            const whatsappUrl = `https://wa.me/${studioPhone}?text=${encodeURIComponent(message)}`;
+            
+            // Open WhatsApp in new tab (non-blocking)
+            setTimeout(() => {
+                window.open(whatsappUrl, '_blank');
+            }, 1000);
+        }
+
         // Lista de Espera
         function entrarListaEspera() {
             const formData = {
@@ -1206,6 +1232,9 @@
             
             agendamentos.push(formData);
             saveToStorage();
+            
+            // Send automatic notification to studio WhatsApp
+            enviarNotificacaoStudio(formData);
             
             // Reset form
             document.getElementById('agendamento-form').reset();
@@ -1246,6 +1275,9 @@
             
             agendamentos.push(formData);
             saveToStorage();
+            
+            // Send automatic notification to studio WhatsApp
+            enviarNotificacaoStudio(formData);
             
             // Reset form
             document.getElementById('agendamento-form').reset();
@@ -1919,5 +1951,5 @@ Obrigado pela preferência! 💅✨
             document.getElementById('success-modal').classList.remove('active');
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a6d34d06dd6278',t:'MTc1NzA4NjgyOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a6dfbc6325c1b6',t:'MTc1NzA4NzMzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
