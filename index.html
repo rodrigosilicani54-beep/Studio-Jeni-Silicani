@@ -87,6 +87,9 @@
                 <p class="text-sm opacity-90">Jeni $ilicani</p>
             </div>
             <div class="text-right text-sm">
+                <div id="sync-status" class="mb-1 text-xs opacity-75">
+                    <span id="sync-indicator">🔄 Sincronizando...</span>
+                </div>
                 <p>📍 Rua das Graviolas N°350</p>
                 <a href="https://wa.me/5511945106374" class="text-yellow-200 hover:text-yellow-100">
                     📱 (11) 94510-6374
@@ -579,6 +582,14 @@
     </div>
 
     <script>
+        // GitHub Configuration
+        const GITHUB_CONFIG = {
+            owner: 'rodrigosilicani54-beep',
+            repo: 'Studio-Jeni-Silicani',
+            token: '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',
+            branch: 'main'
+        };
+
         // Data Storage
         let services = [
             { id: 1, name: 'Limpeza de pele', price: 40 },
@@ -608,6 +619,7 @@
         let isAdminLoggedIn = false;
         let ADMIN_PIN = '123456';
         let cupomCounter = 1;
+        let isOnline = navigator.onLine;
 
         // Configurações padrão
         let config = {
@@ -629,18 +641,206 @@
             githubUrl: 'https://rodrigosilicani54-beep.github.io/Studio-Jeni-Silicani/'
         };
 
+        // GitHub Sync Functions
+        async function salvarNoGitHub(arquivo, dados) {
+            if (!isOnline) {
+                console.log('Offline - dados salvos localmente');
+                return;
+            }
+
+            try {
+                const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${arquivo}`;
+                
+                // Passo 1: Tentar pegar o arquivo atual
+                let sha = null;
+                try {
+                    const res = await fetch(url, {
+                        headers: { 
+                            'Authorization': `token ${GITHUB_CONFIG.token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    
+                    if (res.ok) {
+                        const arquivoAtual = await res.json();
+                        sha = arquivoAtual.sha;
+                    }
+                } catch (e) {
+                    console.log('Arquivo não existe ainda, será criado');
+                }
+                
+                // Passo 2: Salvar/atualizar arquivo
+                const novoConteudo = btoa(JSON.stringify(dados, null, 2));
+                
+                const body = {
+                    message: `Atualizar ${arquivo}`,
+                    content: novoConteudo,
+                    branch: GITHUB_CONFIG.branch
+                };
+                
+                if (sha) {
+                    body.sha = sha;
+                }
+                
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                if (response.ok) {
+                    console.log(`${arquivo} salvo no GitHub com sucesso`);
+                } else {
+                    console.error(`Erro ao salvar ${arquivo}:`, await response.text());
+                }
+                
+            } catch (error) {
+                console.error(`Erro ao conectar com GitHub para ${arquivo}:`, error);
+            }
+        }
+
+        async function carregarDoGitHub(arquivo) {
+            if (!isOnline) {
+                console.log('Offline - usando dados locais');
+                return null;
+            }
+
+            try {
+                const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${arquivo}`;
+                
+                const response = await fetch(url, {
+                    headers: { 
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const conteudo = atob(data.content);
+                    return JSON.parse(conteudo);
+                } else {
+                    console.log(`${arquivo} não encontrado no GitHub`);
+                    return null;
+                }
+                
+            } catch (error) {
+                console.error(`Erro ao carregar ${arquivo} do GitHub:`, error);
+                return null;
+            }
+        }
+
+        function updateSyncStatus(status, message) {
+            const indicator = document.getElementById('sync-indicator');
+            if (indicator) {
+                indicator.textContent = message;
+                indicator.className = status === 'success' ? 'text-green-200' : 
+                                   status === 'error' ? 'text-red-200' : 
+                                   status === 'offline' ? 'text-yellow-200' : '';
+            }
+        }
+
+        async function sincronizarDados() {
+            if (!isOnline) {
+                updateSyncStatus('offline', '📱 Offline');
+                return;
+            }
+
+            updateSyncStatus('syncing', '🔄 Sincronizando...');
+            
+            try {
+                // Salvar todos os dados no GitHub
+                await Promise.all([
+                    salvarNoGitHub('agendamentos.json', agendamentos),
+                    salvarNoGitHub('services.json', services),
+                    salvarNoGitHub('cupons.json', cupons),
+                    salvarNoGitHub('config.json', { ...config, pin: ADMIN_PIN, cupomCounter })
+                ]);
+                
+                updateSyncStatus('success', '✅ Sincronizado');
+                
+                // Hide success message after 3 seconds
+                setTimeout(() => {
+                    updateSyncStatus('online', '🌐 Online');
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Erro na sincronização:', error);
+                updateSyncStatus('error', '❌ Erro sync');
+                
+                // Show error for 5 seconds then show online status
+                setTimeout(() => {
+                    updateSyncStatus('online', '🌐 Online');
+                }, 5000);
+            }
+        }
+
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Monitor connection status
+            window.addEventListener('online', () => {
+                isOnline = true;
+                console.log('Conectado - sincronizando dados...');
+                updateSyncStatus('online', '🌐 Online');
+                sincronizarDados();
+            });
+            
+            window.addEventListener('offline', () => {
+                isOnline = false;
+                console.log('Desconectado - modo offline');
+                updateSyncStatus('offline', '📱 Offline');
+            });
+
+            // Try to load from GitHub first, fallback to localStorage
+            try {
+                const [githubAgendamentos, githubServices, githubCupons, githubConfig] = await Promise.all([
+                    carregarDoGitHub('agendamentos.json'),
+                    carregarDoGitHub('services.json'),
+                    carregarDoGitHub('cupons.json'),
+                    carregarDoGitHub('config.json')
+                ]);
+
+                if (githubAgendamentos) agendamentos = githubAgendamentos;
+                if (githubServices) services = githubServices;
+                if (githubCupons) cupons = githubCupons;
+                if (githubConfig) {
+                    config = { ...config, ...githubConfig };
+                    if (githubConfig.pin) ADMIN_PIN = githubConfig.pin;
+                    if (githubConfig.cupomCounter) cupomCounter = githubConfig.cupomCounter;
+                }
+
+                console.log('Dados carregados do GitHub');
+                updateSyncStatus('success', '✅ Dados carregados');
+            } catch (error) {
+                console.log('Erro ao carregar do GitHub, usando dados locais');
+                updateSyncStatus('error', '❌ Usando dados locais');
+            }
+
+            // Fallback to localStorage if GitHub failed
+            loadFromStorage();
+            
             loadCatalogo();
             loadServiceOptions();
             setupDateInput();
             setupPhoneMask();
-            loadFromStorage();
             loadConfiguracoes();
             setupCupomCalculation();
             
             // Set today's date for cupom
             document.getElementById('cupom-data').value = new Date().toISOString().split('T')[0];
+            
+            // Set initial status after loading
+            setTimeout(() => {
+                if (isOnline) {
+                    updateSyncStatus('online', '🌐 Online');
+                } else {
+                    updateSyncStatus('offline', '📱 Offline');
+                }
+            }, 2000);
         });
 
         // Load data from localStorage
@@ -678,14 +878,20 @@
             }
         }
 
-        // Save data to localStorage
+        // Save data to localStorage and GitHub
         function saveToStorage() {
+            // Save to localStorage (immediate)
             localStorage.setItem('studioServices', JSON.stringify(services));
             localStorage.setItem('studioAgendamentos', JSON.stringify(agendamentos));
             localStorage.setItem('studioCupons', JSON.stringify(cupons));
             localStorage.setItem('studioConfig', JSON.stringify(config));
             localStorage.setItem('studioPin', ADMIN_PIN);
             localStorage.setItem('studioCupomCounter', cupomCounter.toString());
+            
+            // Save to GitHub (async, non-blocking)
+            sincronizarDados().catch(error => {
+                console.error('Erro ao sincronizar com GitHub:', error);
+            });
         }
 
         // Tab Navigation
@@ -1713,5 +1919,5 @@ Obrigado pela preferência! 💅✨
             document.getElementById('success-modal').classList.remove('active');
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a68102429fc1b6',t:'MTc1NzA4MzQ1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a6d34d06dd6278',t:'MTc1NzA4NjgyOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
