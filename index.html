@@ -372,8 +372,9 @@
                         <div class="bg-white p-4 rounded-xl shadow-md">
                             <h4 class="font-semibold text-gray-800 mb-4">🕒 Horário de Funcionamento</h4>
                             <div class="space-y-3">
-                                <div class="grid grid-cols-3 gap-2 text-sm">
+                                <div class="grid grid-cols-4 gap-2 text-sm">
                                     <div class="font-medium">Dia</div>
+                                    <div class="font-medium">Status</div>
                                     <div class="font-medium">Abertura</div>
                                     <div class="font-medium">Fechamento</div>
                                 </div>
@@ -1488,14 +1489,44 @@ Obrigado pela preferência! 💅✨
             dias.forEach((dia, index) => {
                 const horario = config.horariosFuncionamento[dia];
                 const row = document.createElement('div');
-                row.className = 'grid grid-cols-3 gap-2 items-center';
+                row.className = 'grid grid-cols-4 gap-2 items-center py-2';
                 row.innerHTML = `
                     <div class="text-sm font-medium">${nomesDias[index]}</div>
-                    <input type="time" value="${horario.abertura}" class="p-2 border border-gray-300 rounded-lg text-sm" data-dia="${dia}" data-tipo="abertura">
-                    <input type="time" value="${horario.fechamento}" class="p-2 border border-gray-300 rounded-lg text-sm" data-dia="${dia}" data-tipo="fechamento">
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" ${horario.ativo ? 'checked' : ''} class="rounded" data-dia="${dia}" data-tipo="ativo" onchange="toggleDiaFuncionamento('${dia}', this.checked)">
+                        <span class="text-xs ${horario.ativo ? 'text-green-600' : 'text-red-600'}">${horario.ativo ? 'Aberto' : 'Fechado'}</span>
+                    </label>
+                    <input type="time" value="${horario.abertura}" class="p-2 border border-gray-300 rounded-lg text-sm ${!horario.ativo ? 'bg-gray-100' : ''}" data-dia="${dia}" data-tipo="abertura" ${!horario.ativo ? 'disabled' : ''}>
+                    <input type="time" value="${horario.fechamento}" class="p-2 border border-gray-300 rounded-lg text-sm ${!horario.ativo ? 'bg-gray-100' : ''}" data-dia="${dia}" data-tipo="fechamento" ${!horario.ativo ? 'disabled' : ''}>
                 `;
                 container.appendChild(row);
             });
+        }
+
+        function toggleDiaFuncionamento(dia, ativo) {
+            config.horariosFuncionamento[dia].ativo = ativo;
+            
+            // Update UI
+            const row = document.querySelector(`[data-dia="${dia}"][data-tipo="ativo"]`).closest('.grid');
+            const aberturaInput = row.querySelector(`[data-tipo="abertura"]`);
+            const fechamentoInput = row.querySelector(`[data-tipo="fechamento"]`);
+            const statusSpan = row.querySelector('span');
+            
+            if (ativo) {
+                aberturaInput.disabled = false;
+                fechamentoInput.disabled = false;
+                aberturaInput.classList.remove('bg-gray-100');
+                fechamentoInput.classList.remove('bg-gray-100');
+                statusSpan.textContent = 'Aberto';
+                statusSpan.className = 'text-xs text-green-600';
+            } else {
+                aberturaInput.disabled = true;
+                fechamentoInput.disabled = true;
+                aberturaInput.classList.add('bg-gray-100');
+                fechamentoInput.classList.add('bg-gray-100');
+                statusSpan.textContent = 'Fechado';
+                statusSpan.className = 'text-xs text-red-600';
+            }
         }
 
         function salvarConfiguracoes() {
@@ -1516,7 +1547,11 @@ Obrigado pela preferência! 💅✨
             horarioInputs.forEach(input => {
                 const dia = input.dataset.dia;
                 const tipo = input.dataset.tipo;
-                config.horariosFuncionamento[dia][tipo] = input.value;
+                if (tipo === 'ativo') {
+                    config.horariosFuncionamento[dia][tipo] = input.checked;
+                } else {
+                    config.horariosFuncionamento[dia][tipo] = input.value;
+                }
             });
             
             saveToStorage();
@@ -1680,5 +1715,5 @@ Obrigado pela preferência! 💅✨
             document.getElementById('success-modal').classList.remove('active');
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a65834e114f1c7',t:'MTc1NzA4MTc4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a6692d55bdc1b6',t:'MTc1NzA4MjQ4Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
