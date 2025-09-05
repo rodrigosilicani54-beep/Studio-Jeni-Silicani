@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio de Beleza Jeni $ilicani</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+        }
+        
+        .service-card {
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            color: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.4);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .status-pendente { background: #fef3c7; color: #92400e; }
+        .status-confirmado { background: #d1fae5; color: #065f46; }
+        .status-concluido { background: #dbeafe; color: #1e40af; }
+        .status-cancelado { background: #fee2e2; color: #991b1b; }
+        .status-espera { background: #f3e8ff; color: #6b21a8; }
+        
+        .filter-btn.active {
+            background: #ec4899 !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white p-4 shadow-lg">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-bold">Studio de Beleza</h1>
+                <p class="text-sm opacity-90">Jeni $ilicani</p>
+            </div>
+            <div class="text-right text-sm">
+                <p>📍 Rua das Graviolas N°350</p>
+                <a href="https://wa.me/5511945106374" class="text-yellow-200 hover:text-yellow-100">
+                    📱 (11) 94510-6374
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pb-20">
+        <!-- Início Tab -->
+        <div id="inicio-tab" class="tab-content fade-in">
+            <div class="p-6">
+                <!-- Logo/Promo Banner -->
+                <div class="bg-gradient-to-r from-pink-500 to-rose-500 text-white p-6 rounded-2xl mb-6 shadow-lg text-center">
+                    <h2 class="text-2xl font-bold mb-2">✨ Bem-vinda!</h2>
+                    <p class="text-lg opacity-90">Transforme sua beleza conosco</p>
+                    <p class="text-sm mt-2 opacity-80">Agende seu horário e venha se cuidar! 💅</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-4">
+                    <button onclick="switchTab('agendar')" class="w-full btn-primary text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg">
+                        📅 Agendar Horário
+                    </button>
+                    <button onclick="switchTab('catalogo')" class="w-full bg-white text-gray-800 py-4 px-6 rounded-xl font-semibold text-lg shadow-lg border-2 border-pink-200 hover:border-pink-400 transition-all">
+                        💄 Ver Catálogo
+                    </button>
+                </div>
+
+                <!-- Info Cards -->
+                <div class="mt-8 grid grid-cols-1 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-md">
+                        <h3 class="font-semibold text-gray-800 mb-2">🕒 Horário de Funcionamento</h3>
+                        <p class="text-gray-600 text-sm">Segunda a Sábado: 9h às 18h</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-md">
+                        <h3 class="font-semibold text-gray-800 mb-2">💳 Formas de Pagamento</h3>
+                        <p class="text-gray-600 text-sm">Dinheiro, PIX, Cartão</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Catálogo Tab (Público - Somente Leitura) -->
+        <div id="catalogo-tab" class="tab-content hidden">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">💄 Nossos Serviços</h2>
+                <div id="catalogo-list" class="space-y-4">
+                    <!-- Services will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Agendar Tab (Público) -->
+        <div id="agendar-tab" class="tab-content hidden">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📅 Agendar Horário</h2>
+                <form id="agendamento-form" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Nome Completo *</label>
+                        <input type="text" id="nome" required class="w-full p-4 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-lg">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Telefone *</label>
+                        <input type="tel" id="telefone" required placeholder="(11) 99999-9999" class="w-full p-4 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-lg">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Serviço *</label>
+                        <select id="servico" required class="w-full p-4 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-lg">
+                            <option value="">Selecione um serviço</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Profissional (Opcional)</label>
+                        <select id="profissional" class="w-full p-4 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-lg">
+                            <option value="">Qualquer profissional</option>
+                            <option value="Jeni">Jeni</option>
+                            <option value="Assistente">Assistente</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Data *</label>
+                        <input type="date" id="data" required class="w-full p-4 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-lg">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Horário *</label>
+                        <select id="horario" required class="w-full p-4 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-lg">
+                            <option value="">Selecione um horário</option>
+                        </select>
+                        <div id="horario-indisponivel" class="hidden mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <p class="text-yellow-800 text-sm mb-2">⚠️ Horário não disponível</p>
+                            <button type="button" onclick="entrarListaEspera()" class="w-full bg-yellow-500 text-white py-2 px-4 rounded-lg font-medium">
+                                📝 Entrar na Lista de Espera
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Observações</label>
+                        <textarea id="observacoes" rows="3" class="w-full p-4 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-lg" placeholder="Alguma observação especial?"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="w-full btn-primary text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg">
+                        ✨ Solicitar Agendamento
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Tab -->
+        <div id="admin-tab" class="tab-content hidden">
+            <div id="admin-login" class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">🔐 Acesso Admin</h2>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <label class="block text-gray-700 font-medium mb-2">PIN (6 dígitos)</label>
+                    <input type="password" id="admin-pin" maxlength="6" class="w-full p-4 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-center text-2xl tracking-widest">
+                    <button onclick="checkAdminPin()" class="w-full mt-4 btn-primary text-white py-4 px-6 rounded-xl font-semibold text-lg">
+                        Entrar
+                    </button>
+                </div>
+            </div>
+
+            <div id="admin-panel" class="hidden">
+                <!-- Admin Sub-tabs -->
+                <div class="bg-white shadow-sm">
+                    <div class="flex">
+                        <button onclick="switchAdminTab('agenda')" id="admin-agenda-btn" class="flex-1 py-3 px-4 text-center font-medium border-b-2 border-pink-500 text-pink-600">
+                            📅 Agenda
+                        </button>
+                        <button onclick="switchAdminTab('catalogo-edit')" id="admin-catalogo-btn" class="flex-1 py-3 px-2 text-center font-medium border-b-2 border-gray-200 text-gray-500 text-xs">
+                            ✏️ Catálogo
+                        </button>
+                        <button onclick="switchAdminTab('cupom')" id="admin-cupom-btn" class="flex-1 py-3 px-2 text-center font-medium border-b-2 border-gray-200 text-gray-500 text-xs">
+                            🧾 Cupom
+                        </button>
+                        <button onclick="switchAdminTab('config')" id="admin-config-btn" class="flex-1 py-3 px-2 text-center font-medium border-b-2 border-gray-200 text-gray-500 text-xs">
+                            ⚙️ Config
+                        </button>
+                        <button onclick="switchAdminTab('relatorios')" id="admin-relatorios-btn" class="flex-1 py-3 px-2 text-center font-medium border-b-2 border-gray-200 text-gray-500 text-xs">
+                            📊 Relatórios
+                        </button>
+                        <button onclick="switchAdminTab('clientes')" id="admin-clientes-btn" class="flex-1 py-3 px-2 text-center font-medium border-b-2 border-gray-200 text-gray-500 text-xs">
+                            👥 Clientes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Agenda -->
+                <div id="admin-agenda" class="p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">📋 Gerenciar Agendamentos</h3>
+                    
+                    <!-- Status Filter -->
+                    <div class="flex space-x-2 mb-6 overflow-x-auto pb-2">
+                        <button onclick="filterAgendamentos('todos')" class="px-4 py-2 bg-pink-500 text-white rounded-full text-sm font-medium whitespace-nowrap filter-btn active">
+                            Todos
+                        </button>
+                        <button onclick="filterAgendamentos('pendente')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium whitespace-nowrap filter-btn">
+                            Pendentes
+                        </button>
+                        <button onclick="filterAgendamentos('confirmado')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium whitespace-nowrap filter-btn">
+                            Confirmados
+                        </button>
+                        <button onclick="filterAgendamentos('concluido')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium whitespace-nowrap filter-btn">
+                            Concluídos
+                        </button>
+                        <button onclick="filterAgendamentos('cancelado')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium whitespace-nowrap filter-btn">
+                            Cancelados
+                        </button>
+                        <button onclick="filterAgendamentos('espera')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium whitespace-nowrap filter-btn">
+                            Lista Espera
+                        </button>
+                    </div>
+
+                    <div id="agendamentos-list" class="space-y-4">
+                        <!-- Agendamentos will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Admin Catálogo Edit -->
+                <div id="admin-catalogo-edit" class="p-6 hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">✏️ Editar Catálogo</h3>
+                        <button onclick="openServiceModal()" class="btn-primary text-white px-4 py-3 rounded-lg font-medium">
+                            + Novo Serviço
+                        </button>
+                    </div>
+                    <div id="admin-catalogo-list" class="space-y-4">
+                        <!-- Editable services will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Admin Cupom Fiscal -->
+                <div id="admin-cupom" class="p-6 hidden">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">🧾 Cupom Fiscal/Recibo</h3>
+                    
+                    <form id="cupom-form" class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Cliente</label>
+                            <select id="cupom-cliente" required class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
+                                <option value="">Selecione um cliente</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Serviços Realizados</label>
+                            <div id="cupom-servicos" class="space-y-2">
+                                <div class="flex space-x-2">
+                                    <select class="flex-1 p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none cupom-servico">
+                                        <option value="">Selecione um serviço</option>
+                                    </select>
+                                    <input type="number" placeholder="Valor" class="w-24 p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none cupom-valor" step="0.01" min="0">
+                                    <button type="button" onclick="removeCupomServico(this)" class="px-3 py-3 bg-red-500 text-white rounded-xl">🗑️</button>
+                                </div>
+                            </div>
+                            <button type="button" onclick="addCupomServico()" class="mt-2 w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-xl font-medium">
+                                + Adicionar Serviço
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Data</label>
+                                <input type="date" id="cupom-data" required class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Profissional</label>
+                                <select id="cupom-profissional" required class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
+                                    <option value="Jeni">Jeni</option>
+                                    <option value="Assistente">Assistente</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Forma de Pagamento</label>
+                            <select id="cupom-pagamento" required class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
+                                <option value="Dinheiro">Dinheiro</option>
+                                <option value="PIX">PIX</option>
+                                <option value="Cartão de Débito">Cartão de Débito</option>
+                                <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Observações</label>
+                            <textarea id="cupom-observacoes" rows="3" class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none" placeholder="Observações adicionais..."></textarea>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-xl">
+                            <div class="flex justify-between items-center text-lg font-bold">
+                                <span>Total:</span>
+                                <span id="cupom-total" class="text-pink-600">R$ 0,00</span>
+                            </div>
+                            <div class="text-sm text-gray-600 mt-1">
+                                <span>Número: </span>
+                                <span id="cupom-numero">CF-202412-0001</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <button type="button" onclick="gerarPDFRecibo()" class="btn-primary text-white py-3 px-4 rounded-xl font-semibold">
+                                📄 Gerar PDF
+                            </button>
+                            <button type="button" onclick="enviarReciboWhats()" class="bg-green-500 text-white py-3 px-4 rounded-xl font-semibold hover:bg-green-600 transition-colors">
+                                📱 Enviar WhatsApp
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Admin Configurações -->
+                <div id="admin-config" class="p-6 hidden">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">⚙️ Configurações</h3>
+                    
+                    <div class="space-y-6">
+                        <!-- Horário de Funcionamento -->
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <h4 class="font-semibold text-gray-800 mb-4">🕒 Horário de Funcionamento</h4>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-3 gap-2 text-sm">
+                                    <div class="font-medium">Dia</div>
+                                    <div class="font-medium">Abertura</div>
+                                    <div class="font-medium">Fechamento</div>
+                                </div>
+                                <div id="horarios-funcionamento">
+                                    <!-- Horários serão carregados aqui -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Templates WhatsApp -->
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <h4 class="font-semibold text-gray-800 mb-4">💬 Templates WhatsApp</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Confirmação</label>
+                                    <textarea id="template-confirmacao" rows="3" class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-sm" placeholder="Olá {nome}, sua reserva no Studio de Beleza Jeni $ilicani foi confirmada..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Lembrete</label>
+                                    <textarea id="template-lembrete" rows="3" class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-sm" placeholder="{nome}, lembrete: amanhã às {hora} serviço {serviço}..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Cancelamento</label>
+                                    <textarea id="template-cancelamento" rows="3" class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-sm" placeholder="Oi {nome}, não conseguimos confirmar seu horário..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Recibo</label>
+                                    <textarea id="template-recibo" rows="3" class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none text-sm" placeholder="{nome}, segue seu Recibo Digital..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Configurações Gerais -->
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <h4 class="font-semibold text-gray-800 mb-4">🔧 Configurações Gerais</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">PIN de Acesso</label>
+                                    <input type="password" id="config-pin" maxlength="6" class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">URL GitHub Pages (Opcional)</label>
+                                    <input type="url" id="config-github" placeholder="https://usuario.github.io/repositorio" class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
+                                    <p class="text-xs text-gray-500 mt-1">Para sincronização automática dos dados</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="salvarConfiguracoes()" class="w-full btn-primary text-white py-4 px-6 rounded-xl font-semibold text-lg">
+                            💾 Salvar Configurações
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Relatórios -->
+                <div id="admin-relatorios" class="p-6 hidden">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">📊 Relatórios</h3>
+                    
+                    <!-- Controle de Caixa -->
+                    <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+                        <h4 class="font-semibold text-gray-800 mb-4">💰 Controle de Caixa</h4>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-green-50 p-3 rounded-lg text-center">
+                                <p class="text-sm text-gray-600">Hoje</p>
+                                <p class="text-xl font-bold text-green-600" id="caixa-hoje">R$ 0,00</p>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                <p class="text-sm text-gray-600">Este Mês</p>
+                                <p class="text-xl font-bold text-blue-600" id="caixa-mes">R$ 0,00</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Resumo por Forma de Pagamento -->
+                        <div class="space-y-2">
+                            <h5 class="font-medium text-gray-700">Por Forma de Pagamento (Hoje)</h5>
+                            <div id="pagamentos-hoje" class="space-y-1 text-sm">
+                                <!-- Será preenchido dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Agendamentos por Serviço -->
+                    <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+                        <h4 class="font-semibold text-gray-800 mb-4">📈 Serviços Mais Realizados (Este Mês)</h4>
+                        <div id="servicos-ranking" class="space-y-2">
+                            <!-- Será preenchido dinamicamente -->
+                        </div>
+                    </div>
+                    
+                    <!-- Agendamentos por Profissional -->
+                    <div class="bg-white p-4 rounded-xl shadow-md">
+                        <h4 class="font-semibold text-gray-800 mb-4">👩‍💼 Agendamentos por Profissional (Este Mês)</h4>
+                        <div id="profissionais-ranking" class="space-y-2">
+                            <!-- Será preenchido dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Clientes -->
+                <div id="admin-clientes" class="p-6 hidden">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">👥 Clientes</h3>
+                    
+                    <div class="mb-4">
+                        <input type="text" id="buscar-cliente" placeholder="Buscar cliente..." class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
+                    </div>
+                    
+                    <div id="clientes-list" class="space-y-4">
+                        <!-- Lista de clientes será carregada aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
+        <div class="flex">
+            <button onclick="switchTab('inicio')" id="nav-inicio" class="flex-1 py-3 px-2 text-center tab-active">
+                <div class="text-xl">🏠</div>
+                <div class="text-xs font-medium">Início</div>
+            </button>
+            <button onclick="switchTab('catalogo')" id="nav-catalogo" class="flex-1 py-3 px-2 text-center text-gray-500">
+                <div class="text-xl">💄</div>
+                <div class="text-xs font-medium">Catálogo</div>
+            </button>
+            <button onclick="switchTab('agendar')" id="nav-agendar" class="flex-1 py-3 px-2 text-center text-gray-500">
+                <div class="text-xl">📅</div>
+                <div class="text-xs font-medium">Agendar</div>
+            </button>
+            <button onclick="switchTab('admin')" id="nav-admin" class="flex-1 py-3 px-2 text-center text-gray-500">
+                <div class="text-xl">⚙️</div>
+                <div class="text-xs font-medium">Admin</div>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Modals -->
+    <!-- Service Modal -->
+    <div id="service-modal" class="modal">
+        <div class="bg-white p-6 rounded-xl shadow-xl max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-800 mb-4" id="service-modal-title">Novo Serviço</h3>
+            <form id="service-form">
+                <input type="hidden" id="service-id">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Nome do Serviço</label>
+                        <input type="text" id="service-name" required class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Preço (R$)</label>
+                        <input type="number" id="service-price" required min="0" step="0.01" class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Observação (opcional)</label>
+                        <input type="text" id="service-note" placeholder="ex: a partir de" class="w-full p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none">
+                    </div>
+                    <div class="flex space-x-3">
+                        <button type="submit" class="flex-1 btn-primary text-white py-3 px-6 rounded-xl font-semibold">
+                            Salvar
+                        </button>
+                        <button type="button" onclick="closeServiceModal()" class="flex-1 bg-gray-300 text-gray-700 py-3 px-6 rounded-xl font-semibold">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Agendamento Modal -->
+    <div id="agendamento-modal" class="modal">
+        <div class="bg-white p-6 rounded-xl shadow-xl max-w-md w-full mx-4 max-h-screen overflow-y-auto">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Gerenciar Agendamento</h3>
+            <div id="agendamento-details" class="space-y-4">
+                <!-- Agendamento details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="bg-white p-6 rounded-xl shadow-xl max-w-md w-full mx-4 text-center">
+            <div class="text-6xl mb-4">✅</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Solicitação Enviada!</h3>
+            <p class="text-gray-600 mb-4">Seu agendamento está pendente de confirmação. Entraremos em contato via WhatsApp em breve!</p>
+            <button onclick="closeSuccessModal()" class="btn-primary text-white py-3 px-6 rounded-xl font-semibold">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <!-- Lista de Espera Modal -->
+    <div id="espera-modal" class="modal">
+        <div class="bg-white p-6 rounded-xl shadow-xl max-w-md w-full mx-4 text-center">
+            <div class="text-6xl mb-4">📝</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Lista de Espera</h3>
+            <p class="text-gray-600 mb-4">Você foi adicionado à lista de espera! Te avisaremos se o horário ficar disponível.</p>
+            <button onclick="closeEsperaModal()" class="btn-primary text-white py-3 px-6 rounded-xl font-semibold">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let services = [
+            { id: 1, name: 'Limpeza de pele', price: 40 },
+            { id: 2, name: 'Esfoliação+Henna Labial', price: 30 },
+            { id: 3, name: 'Sobrancelhas', price: 20 },
+            { id: 4, name: 'Sobrancelhas+Henna', price: 30 },
+            { id: 5, name: 'Depilação Buço', price: 20 },
+            { id: 6, name: 'Hidratação+Escova', price: 60 },
+            { id: 7, name: 'Coloração tinta cliente+Escova', price: 60 },
+            { id: 8, name: 'Coloração tinta salão+Escova', price: 90 },
+            { id: 9, name: 'Progressiva sem formol', price: 100, note: 'a partir de' },
+            { id: 10, name: 'Progressiva/Selagem', price: 120, note: 'a partir de' },
+            { id: 11, name: 'Botox Capilar', price: 90, note: 'a partir de' },
+            { id: 12, name: 'Corte', price: 30 },
+            { id: 13, name: 'Manicure+Pedicure', price: 50 },
+            { id: 14, name: 'SPA dos pés', price: 35 },
+            { id: 15, name: 'Blindagem', price: 30 },
+            { id: 16, name: 'Esmaltação em gel', price: 40 },
+            { id: 17, name: 'Fibra de vidro+cutilagem', price: 120 },
+            { id: 18, name: 'Manutenção Fibra de vidro', price: 80 },
+            { id: 19, name: 'Remoção', price: 70 }
+        ];
+
+        let agendamentos = [];
+        let cupons = [];
+        let currentFilter = 'todos';
+        let isAdminLoggedIn = false;
+        let ADMIN_PIN = '123456';
+        let cupomCounter = 1;
+
+        // Configurações padrão
+        let config = {
+            horariosFuncionamento: {
+                'segunda': { abertura: '09:00', fechamento: '18:00', ativo: true },
+                'terca': { abertura: '09:00', fechamento: '18:00', ativo: true },
+                'quarta': { abertura: '09:00', fechamento: '18:00', ativo: true },
+                'quinta': { abertura: '09:00', fechamento: '18:00', ativo: true },
+                'sexta': { abertura: '09:00', fechamento: '18:00', ativo: true },
+                'sabado': { abertura: '09:00', fechamento: '18:00', ativo: true },
+                'domingo': { abertura: '09:00', fechamento: '18:00', ativo: false }
+            },
+            templates: {
+                confirmacao: 'Olá {nome}, sua reserva no Studio de Beleza Jeni $ilicani foi confirmada para {data} às {hora}, serviço {servico}, endereço Rua das Graviolas N°350 💇✨',
+                lembrete: '{nome}, lembrete: amanhã às {hora} serviço {servico}. Endereço Rua das Graviolas N°350 📍',
+                cancelamento: 'Oi {nome}, não conseguimos confirmar seu horário {data} {hora}. Vamos achar outro?',
+                recibo: '{nome}, segue seu Recibo Digital: {itens}, total R$ {total} em {pagamento}. Obrigado por escolher o Studio 🙌'
+            },
+            githubUrl: ''
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCatalogo();
+            loadServiceOptions();
+            setupDateInput();
+            setupPhoneMask();
+            loadFromStorage();
+            loadConfiguracoes();
+            setupCupomCalculation();
+            
+            // Set today's date for cupom
+            document.getElementById('cupom-data').value = new Date().toISOString().split('T')[0];
+        });
+
+        // Load data from localStorage
+        function loadFromStorage() {
+            const savedServices = localStorage.getItem('studioServices');
+            if (savedServices) {
+                services = JSON.parse(savedServices);
+                loadCatalogo();
+                loadServiceOptions();
+            }
+            
+            const savedAgendamentos = localStorage.getItem('studioAgendamentos');
+            if (savedAgendamentos) {
+                agendamentos = JSON.parse(savedAgendamentos);
+            }
+            
+            const savedCupons = localStorage.getItem('studioCupons');
+            if (savedCupons) {
+                cupons = JSON.parse(savedCupons);
+            }
+            
+            const savedConfig = localStorage.getItem('studioConfig');
+            if (savedConfig) {
+                config = { ...config, ...JSON.parse(savedConfig) };
+            }
+            
+            const savedPin = localStorage.getItem('studioPin');
+            if (savedPin) {
+                ADMIN_PIN = savedPin;
+            }
+            
+            const savedCounter = localStorage.getItem('studioCupomCounter');
+            if (savedCounter) {
+                cupomCounter = parseInt(savedCounter);
+            }
+        }
+
+        // Save data to localStorage
+        function saveToStorage() {
+            localStorage.setItem('studioServices', JSON.stringify(services));
+            localStorage.setItem('studioAgendamentos', JSON.stringify(agendamentos));
+            localStorage.setItem('studioCupons', JSON.stringify(cupons));
+            localStorage.setItem('studioConfig', JSON.stringify(config));
+            localStorage.setItem('studioPin', ADMIN_PIN);
+            localStorage.setItem('studioCupomCounter', cupomCounter.toString());
+        }
+
+        // Tab Navigation
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+            
+            // Update navigation
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('text-gray-500');
+            });
+            
+            document.getElementById('nav-' + tabName).classList.add('tab-active');
+            document.getElementById('nav-' + tabName).classList.remove('text-gray-500');
+
+            // Reset admin if switching away
+            if (tabName !== 'admin') {
+                document.getElementById('admin-login').classList.remove('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
+                isAdminLoggedIn = false;
+            }
+        }
+
+        // Admin Functions
+        function checkAdminPin() {
+            const pin = document.getElementById('admin-pin').value;
+            if (pin === ADMIN_PIN) {
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                isAdminLoggedIn = true;
+                loadAdminCatalogo();
+                loadAgendamentos();
+            } else {
+                alert('PIN incorreto!');
+                document.getElementById('admin-pin').value = '';
+            }
+        }
+
+        function switchAdminTab(tabName) {
+            // Hide all admin tabs
+            document.getElementById('admin-agenda').classList.add('hidden');
+            document.getElementById('admin-catalogo-edit').classList.add('hidden');
+            document.getElementById('admin-cupom').classList.add('hidden');
+            document.getElementById('admin-config').classList.add('hidden');
+            document.getElementById('admin-relatorios').classList.add('hidden');
+            document.getElementById('admin-clientes').classList.add('hidden');
+            
+            // Show selected tab
+            document.getElementById('admin-' + tabName).classList.remove('hidden');
+            
+            // Update buttons
+            document.querySelectorAll('[id^="admin-"][id$="-btn"]').forEach(btn => {
+                btn.classList.remove('border-pink-500', 'text-pink-600');
+                btn.classList.add('border-gray-200', 'text-gray-500');
+            });
+            
+            document.getElementById('admin-' + tabName + '-btn').classList.add('border-pink-500', 'text-pink-600');
+            document.getElementById('admin-' + tabName + '-btn').classList.remove('border-gray-200', 'text-gray-500');
+            
+            // Load specific data for each tab
+            if (tabName === 'cupom') {
+                loadCupomClientes();
+                loadCupomServicos();
+                updateCupomNumber();
+            } else if (tabName === 'config') {
+                loadConfigurationsUI();
+            } else if (tabName === 'relatorios') {
+                loadRelatorios();
+            } else if (tabName === 'clientes') {
+                loadClientes();
+            }
+        }
+
+        // Catalog Functions (Public - Read Only)
+        function loadCatalogo() {
+            const catalogoList = document.getElementById('catalogo-list');
+            catalogoList.innerHTML = '';
+            
+            services.forEach(service => {
+                const serviceCard = document.createElement('div');
+                serviceCard.className = 'service-card bg-white p-4 rounded-xl shadow-md border border-gray-100';
+                
+                const priceText = service.note ? `${service.note} R$ ${service.price.toFixed(2)}` : `R$ ${service.price.toFixed(2)}`;
+                
+                serviceCard.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-semibold text-gray-800 text-lg">${service.name}</h3>
+                            <p class="text-pink-600 font-bold text-xl">${priceText}</p>
+                        </div>
+                        <div class="text-3xl">💅</div>
+                    </div>
+                `;
+                
+                catalogoList.appendChild(serviceCard);
+            });
+        }
+
+        function loadServiceOptions() {
+            const servicoSelect = document.getElementById('servico');
+            servicoSelect.innerHTML = '<option value="">Selecione um serviço</option>';
+            
+            services.forEach(service => {
+                const option = document.createElement('option');
+                option.value = service.id;
+                const priceText = service.note ? `${service.note} R$ ${service.price.toFixed(2)}` : `R$ ${service.price.toFixed(2)}`;
+                option.textContent = `${service.name} - ${priceText}`;
+                servicoSelect.appendChild(option);
+            });
+        }
+
+        function loadAdminCatalogo() {
+            const adminCatalogoList = document.getElementById('admin-catalogo-list');
+            adminCatalogoList.innerHTML = '';
+            
+            services.forEach(service => {
+                const serviceCard = document.createElement('div');
+                serviceCard.className = 'bg-white p-4 rounded-xl shadow-md border border-gray-100';
+                
+                const priceText = service.note ? `${service.note} R$ ${service.price.toFixed(2)}` : `R$ ${service.price.toFixed(2)}`;
+                
+                serviceCard.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">${service.name}</h3>
+                            <p class="text-pink-600 font-bold">${priceText}</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editService(${service.id})" class="text-blue-600 hover:text-blue-800 p-2 text-xl">
+                                ✏️
+                            </button>
+                            <button onclick="deleteService(${service.id})" class="text-red-600 hover:text-red-800 p-2 text-xl">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                adminCatalogoList.appendChild(serviceCard);
+            });
+        }
+
+        // Service Management
+        function openServiceModal(serviceId = null) {
+            const modal = document.getElementById('service-modal');
+            const title = document.getElementById('service-modal-title');
+            const form = document.getElementById('service-form');
+            
+            if (serviceId) {
+                const service = services.find(s => s.id === serviceId);
+                title.textContent = 'Editar Serviço';
+                document.getElementById('service-id').value = service.id;
+                document.getElementById('service-name').value = service.name;
+                document.getElementById('service-price').value = service.price;
+                document.getElementById('service-note').value = service.note || '';
+            } else {
+                title.textContent = 'Novo Serviço';
+                form.reset();
+                document.getElementById('service-id').value = '';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeServiceModal() {
+            document.getElementById('service-modal').classList.remove('active');
+        }
+
+        function editService(serviceId) {
+            openServiceModal(serviceId);
+        }
+
+        function deleteService(serviceId) {
+            if (confirm('Tem certeza que deseja excluir este serviço?')) {
+                services = services.filter(s => s.id !== serviceId);
+                loadAdminCatalogo();
+                loadCatalogo(); // Update public catalog
+                loadServiceOptions();
+                saveToStorage();
+            }
+        }
+
+        // Service Form Handler
+        document.getElementById('service-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const serviceId = document.getElementById('service-id').value;
+            const name = document.getElementById('service-name').value;
+            const price = parseFloat(document.getElementById('service-price').value);
+            const note = document.getElementById('service-note').value;
+            
+            if (serviceId) {
+                // Edit existing service
+                const serviceIndex = services.findIndex(s => s.id === parseInt(serviceId));
+                services[serviceIndex] = { ...services[serviceIndex], name, price, note: note || undefined };
+            } else {
+                // Add new service
+                const newId = Math.max(...services.map(s => s.id)) + 1;
+                const newService = { id: newId, name, price };
+                if (note) newService.note = note;
+                services.push(newService);
+            }
+            
+            loadAdminCatalogo();
+            loadCatalogo(); // Update public catalog automatically
+            loadServiceOptions();
+            saveToStorage();
+            closeServiceModal();
+        });
+
+        // Date and Time Setup
+        function setupDateInput() {
+            const dateInput = document.getElementById('data');
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            dateInput.min = tomorrow.toISOString().split('T')[0];
+            
+            dateInput.addEventListener('change', loadAvailableHours);
+        }
+
+        function loadAvailableHours() {
+            const horarioSelect = document.getElementById('horario');
+            const selectedDate = document.getElementById('data').value;
+            const horarioIndisponivel = document.getElementById('horario-indisponivel');
+            
+            if (!selectedDate) {
+                horarioSelect.innerHTML = '<option value="">Selecione um horário</option>';
+                horarioIndisponivel.classList.add('hidden');
+                return;
+            }
+            
+            const availableHours = [
+                '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+                '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+                '16:00', '16:30', '17:00', '17:30'
+            ];
+            
+            // Filter out booked hours
+            const bookedHours = agendamentos
+                .filter(a => a.data === selectedDate && (a.status === 'confirmado' || a.status === 'pendente'))
+                .map(a => a.horario);
+            
+            const freeHours = availableHours.filter(hour => !bookedHours.includes(hour));
+            
+            horarioSelect.innerHTML = '<option value="">Selecione um horário</option>';
+            
+            if (freeHours.length === 0) {
+                horarioIndisponivel.classList.remove('hidden');
+            } else {
+                horarioIndisponivel.classList.add('hidden');
+                freeHours.forEach(hour => {
+                    const option = document.createElement('option');
+                    option.value = hour;
+                    option.textContent = hour;
+                    horarioSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Phone Mask (Brazilian format)
+        function setupPhoneMask() {
+            const phoneInput = document.getElementById('telefone');
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 11) {
+                    value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                } else if (value.length >= 7) {
+                    value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+                } else if (value.length >= 3) {
+                    value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+                }
+                e.target.value = value;
+            });
+        }
+
+        // Lista de Espera
+        function entrarListaEspera() {
+            const formData = {
+                id: Date.now(),
+                nome: document.getElementById('nome').value,
+                telefone: document.getElementById('telefone').value,
+                servico: document.getElementById('servico').value,
+                servicoNome: document.getElementById('servico').selectedOptions[0]?.text || '',
+                profissional: document.getElementById('profissional').value || 'Qualquer profissional',
+                data: document.getElementById('data').value,
+                horario: 'Lista de Espera',
+                observacoes: document.getElementById('observacoes').value,
+                status: 'espera',
+                timestamp: new Date().toISOString()
+            };
+            
+            // Validate required fields
+            if (!formData.nome || !formData.telefone || !formData.servico || !formData.data) {
+                alert('Por favor, preencha todos os campos obrigatórios');
+                return;
+            }
+            
+            // Validate phone
+            const phoneRegex = /^\(\d{2}\) \d{4,5}-\d{4}$/;
+            if (!phoneRegex.test(formData.telefone)) {
+                alert('Por favor, insira um telefone válido no formato (11) 99999-9999');
+                return;
+            }
+            
+            agendamentos.push(formData);
+            saveToStorage();
+            
+            // Reset form
+            document.getElementById('agendamento-form').reset();
+            document.getElementById('horario-indisponivel').classList.add('hidden');
+            
+            // Show success modal
+            document.getElementById('espera-modal').classList.add('active');
+        }
+
+        function closeEsperaModal() {
+            document.getElementById('espera-modal').classList.remove('active');
+        }
+
+        // Agendamento Form (Public)
+        document.getElementById('agendamento-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: Date.now(),
+                nome: document.getElementById('nome').value,
+                telefone: document.getElementById('telefone').value,
+                servico: document.getElementById('servico').value,
+                servicoNome: document.getElementById('servico').selectedOptions[0].text,
+                profissional: document.getElementById('profissional').value || 'Qualquer profissional',
+                data: document.getElementById('data').value,
+                horario: document.getElementById('horario').value,
+                observacoes: document.getElementById('observacoes').value,
+                status: 'pendente',
+                timestamp: new Date().toISOString()
+            };
+            
+            // Validate phone
+            const phoneRegex = /^\(\d{2}\) \d{4,5}-\d{4}$/;
+            if (!phoneRegex.test(formData.telefone)) {
+                alert('Por favor, insira um telefone válido no formato (11) 99999-9999');
+                return;
+            }
+            
+            agendamentos.push(formData);
+            saveToStorage();
+            
+            // Reset form
+            document.getElementById('agendamento-form').reset();
+            
+            // Show success modal
+            document.getElementById('success-modal').classList.add('active');
+            
+            // Reload available hours
+            loadAvailableHours();
+        });
+
+        // Agendamentos Management (Admin)
+        function loadAgendamentos() {
+            const agendamentosList = document.getElementById('agendamentos-list');
+            agendamentosList.innerHTML = '';
+            
+            let filteredAgendamentos = agendamentos;
+            if (currentFilter !== 'todos') {
+                filteredAgendamentos = agendamentos.filter(a => a.status === currentFilter);
+            }
+            
+            if (filteredAgendamentos.length === 0) {
+                agendamentosList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <div class="text-4xl mb-2">📅</div>
+                        <p>Nenhum agendamento encontrado</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by date and time
+            filteredAgendamentos.sort((a, b) => {
+                if (a.status === 'espera' && b.status !== 'espera') return 1;
+                if (b.status === 'espera' && a.status !== 'espera') return -1;
+                return new Date(a.data + ' ' + a.horario) - new Date(b.data + ' ' + b.horario);
+            });
+            
+            filteredAgendamentos.forEach(agendamento => {
+                const agendamentoCard = document.createElement('div');
+                agendamentoCard.className = 'bg-white p-4 rounded-xl shadow-md border border-gray-100';
+                
+                const statusEmojis = {
+                    'pendente': '⏳',
+                    'confirmado': '✅',
+                    'concluido': '🎉',
+                    'cancelado': '❌',
+                    'espera': '📝'
+                };
+                
+                const statusNames = {
+                    'pendente': 'Pendente',
+                    'confirmado': 'Confirmado',
+                    'concluido': 'Concluído',
+                    'cancelado': 'Cancelado',
+                    'espera': 'Lista de Espera'
+                };
+                
+                agendamentoCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-semibold text-gray-800 text-lg">${agendamento.nome}</h3>
+                            <p class="text-sm text-gray-600">${agendamento.telefone}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium status-${agendamento.status}">
+                            ${statusEmojis[agendamento.status]} ${statusNames[agendamento.status]}
+                        </span>
+                    </div>
+                    <div class="space-y-1 text-sm text-gray-600 mb-3">
+                        <p><strong>Serviço:</strong> ${agendamento.servicoNome}</p>
+                        <p><strong>Data:</strong> ${formatDate(agendamento.data)}</p>
+                        <p><strong>Horário:</strong> ${agendamento.horario}</p>
+                        <p><strong>Profissional:</strong> ${agendamento.profissional}</p>
+                        ${agendamento.observacoes ? `<p><strong>Obs:</strong> ${agendamento.observacoes}</p>` : ''}
+                    </div>
+                    <button onclick="openAgendamentoModal(${agendamento.id})" class="w-full bg-pink-50 text-pink-600 py-3 px-4 rounded-lg font-medium hover:bg-pink-100 transition-colors">
+                        Gerenciar
+                    </button>
+                `;
+                
+                agendamentosList.appendChild(agendamentoCard);
+            });
+        }
+
+        function filterAgendamentos(status) {
+            currentFilter = status;
+            
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            
+            loadAgendamentos();
+        }
+
+        function openAgendamentoModal(agendamentoId) {
+            const agendamento = agendamentos.find(a => a.id === agendamentoId);
+            const modal = document.getElementById('agendamento-modal');
+            const details = document.getElementById('agendamento-details');
+            
+            const statusNames = {
+                'pendente': 'Pendente',
+                'confirmado': 'Confirmado',
+                'concluido': 'Concluído',
+                'cancelado': 'Cancelado',
+                'espera': 'Lista de Espera'
+            };
+            
+            details.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-gray-800 mb-2 text-lg">${agendamento.nome}</h4>
+                        <p class="text-sm text-gray-600 mb-2">${agendamento.telefone}</p>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium status-${agendamento.status}">
+                            ${statusNames[agendamento.status]}
+                        </span>
+                    </div>
+                    
+                    <div class="space-y-2 text-sm">
+                        <p><strong>Serviço:</strong> ${agendamento.servicoNome}</p>
+                        <p><strong>Data:</strong> ${formatDate(agendamento.data)}</p>
+                        <p><strong>Horário:</strong> ${agendamento.horario}</p>
+                        <p><strong>Profissional:</strong> ${agendamento.profissional}</p>
+                        ${agendamento.observacoes ? `<p><strong>Observações:</strong> ${agendamento.observacoes}</p>` : ''}
+                    </div>
+                    
+                    <div class="space-y-3">
+                        ${agendamento.status === 'pendente' || agendamento.status === 'espera' ? `
+                            <button onclick="updateAgendamentoStatus(${agendamento.id}, 'confirmado')" class="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-medium text-lg">
+                                ✅ Confirmar Agendamento
+                            </button>
+                            <button onclick="updateAgendamentoStatus(${agendamento.id}, 'cancelado')" class="w-full bg-red-500 text-white py-3 px-4 rounded-lg font-medium text-lg">
+                                ❌ Cancelar Agendamento
+                            </button>
+                        ` : ''}
+                        
+                        ${agendamento.status === 'confirmado' ? `
+                            <button onclick="updateAgendamentoStatus(${agendamento.id}, 'concluido')" class="w-full bg-blue-500 text-white py-3 px-4 rounded-lg font-medium text-lg">
+                                🎉 Marcar como Concluído
+                            </button>
+                            <button onclick="updateAgendamentoStatus(${agendamento.id}, 'cancelado')" class="w-full bg-red-500 text-white py-3 px-4 rounded-lg font-medium text-lg">
+                                ❌ Cancelar Agendamento
+                            </button>
+                        ` : ''}
+                        
+                        <button onclick="closeAgendamentoModal()" class="w-full bg-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium text-lg">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeAgendamentoModal() {
+            document.getElementById('agendamento-modal').classList.remove('active');
+        }
+
+        function updateAgendamentoStatus(agendamentoId, newStatus) {
+            const agendamento = agendamentos.find(a => a.id === agendamentoId);
+            agendamento.status = newStatus;
+            
+            // If confirming, send WhatsApp message
+            if (newStatus === 'confirmado') {
+                const message = config.templates.confirmacao
+                    .replace('{nome}', agendamento.nome)
+                    .replace('{data}', formatDate(agendamento.data))
+                    .replace('{hora}', agendamento.horario)
+                    .replace('{servico}', agendamento.servicoNome);
+                const whatsappUrl = `https://wa.me/55${agendamento.telefone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            }
+            
+            saveToStorage();
+            loadAgendamentos();
+            closeAgendamentoModal();
+        }
+
+        // Cupom Functions
+        function loadCupomClientes() {
+            const clienteSelect = document.getElementById('cupom-cliente');
+            clienteSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+            
+            // Get unique clients from agendamentos
+            const clientes = [...new Set(agendamentos.map(a => a.nome))];
+            clientes.forEach(cliente => {
+                const option = document.createElement('option');
+                option.value = cliente;
+                option.textContent = cliente;
+                clienteSelect.appendChild(option);
+            });
+        }
+
+        function loadCupomServicos() {
+            const servicoSelects = document.querySelectorAll('.cupom-servico');
+            servicoSelects.forEach(select => {
+                select.innerHTML = '<option value="">Selecione um serviço</option>';
+                services.forEach(service => {
+                    const option = document.createElement('option');
+                    option.value = service.id;
+                    option.dataset.price = service.price;
+                    const priceText = service.note ? `${service.note} R$ ${service.price.toFixed(2)}` : `R$ ${service.price.toFixed(2)}`;
+                    option.textContent = `${service.name} - ${priceText}`;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        function addCupomServico() {
+            const container = document.getElementById('cupom-servicos');
+            const newRow = document.createElement('div');
+            newRow.className = 'flex space-x-2';
+            newRow.innerHTML = `
+                <select class="flex-1 p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none cupom-servico">
+                    <option value="">Selecione um serviço</option>
+                </select>
+                <input type="number" placeholder="Valor" class="w-24 p-3 border border-gray-300 rounded-xl focus:border-pink-500 focus:outline-none cupom-valor" step="0.01" min="0">
+                <button type="button" onclick="removeCupomServico(this)" class="px-3 py-3 bg-red-500 text-white rounded-xl">🗑️</button>
+            `;
+            container.appendChild(newRow);
+            
+            // Load services for the new select
+            const newSelect = newRow.querySelector('.cupom-servico');
+            services.forEach(service => {
+                const option = document.createElement('option');
+                option.value = service.id;
+                option.dataset.price = service.price;
+                const priceText = service.note ? `${service.note} R$ ${service.price.toFixed(2)}` : `R$ ${service.price.toFixed(2)}`;
+                option.textContent = `${service.name} - ${priceText}`;
+                newSelect.appendChild(option);
+            });
+            
+            // Add event listeners
+            newSelect.addEventListener('change', updateCupomTotal);
+            newRow.querySelector('.cupom-valor').addEventListener('input', updateCupomTotal);
+        }
+
+        function removeCupomServico(button) {
+            button.parentElement.remove();
+            updateCupomTotal();
+        }
+
+        function setupCupomCalculation() {
+            // Add event listeners for automatic calculation
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('cupom-servico')) {
+                    const valorInput = e.target.parentElement.querySelector('.cupom-valor');
+                    const selectedOption = e.target.selectedOptions[0];
+                    if (selectedOption && selectedOption.dataset.price) {
+                        valorInput.value = selectedOption.dataset.price;
+                    }
+                    updateCupomTotal();
+                }
+            });
+            
+            document.addEventListener('input', function(e) {
+                if (e.target.classList.contains('cupom-valor')) {
+                    updateCupomTotal();
+                }
+            });
+        }
+
+        function updateCupomTotal() {
+            const valorInputs = document.querySelectorAll('.cupom-valor');
+            let total = 0;
+            
+            valorInputs.forEach(input => {
+                const valor = parseFloat(input.value) || 0;
+                total += valor;
+            });
+            
+            document.getElementById('cupom-total').textContent = `R$ ${total.toFixed(2)}`;
+        }
+
+        function updateCupomNumber() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const number = String(cupomCounter).padStart(4, '0');
+            
+            document.getElementById('cupom-numero').textContent = `CF-${year}${month}-${number}`;
+        }
+
+        function gerarPDFRecibo() {
+            const cliente = document.getElementById('cupom-cliente').value;
+            const data = document.getElementById('cupom-data').value;
+            const profissional = document.getElementById('cupom-profissional').value;
+            const pagamento = document.getElementById('cupom-pagamento').value;
+            const observacoes = document.getElementById('cupom-observacoes').value;
+            const total = document.getElementById('cupom-total').textContent;
+            const numero = document.getElementById('cupom-numero').textContent;
+            
+            if (!cliente) {
+                alert('Selecione um cliente');
+                return;
+            }
+            
+            // Get services
+            const servicoSelects = document.querySelectorAll('.cupom-servico');
+            const valorInputs = document.querySelectorAll('.cupom-valor');
+            const servicos = [];
+            
+            servicoSelects.forEach((select, index) => {
+                if (select.value && valorInputs[index].value) {
+                    const serviceName = select.selectedOptions[0].textContent.split(' - ')[0];
+                    servicos.push({
+                        nome: serviceName,
+                        valor: parseFloat(valorInputs[index].value)
+                    });
+                }
+            });
+            
+            if (servicos.length === 0) {
+                alert('Adicione pelo menos um serviço');
+                return;
+            }
+            
+            // Create cupom record
+            const cupom = {
+                id: Date.now(),
+                numero: numero,
+                cliente: cliente,
+                data: data,
+                profissional: profissional,
+                pagamento: pagamento,
+                servicos: servicos,
+                total: servicos.reduce((sum, s) => sum + s.valor, 0),
+                observacoes: observacoes,
+                timestamp: new Date().toISOString()
+            };
+            
+            cupons.push(cupom);
+            cupomCounter++;
+            saveToStorage();
+            
+            // Generate PDF content (simplified)
+            const pdfContent = `
+STUDIO DE BELEZA JENI $ILICANI
+Rua das Graviolas N°350
+(11) 94510-6374
+
+RECIBO DIGITAL
+Número: ${numero}
+
+Cliente: ${cliente}
+Data: ${formatDate(data)}
+Profissional: ${profissional}
+
+SERVIÇOS:
+${servicos.map(s => `${s.nome} - R$ ${s.valor.toFixed(2)}`).join('\n')}
+
+TOTAL: ${total}
+Pagamento: ${pagamento}
+
+${observacoes ? `Observações: ${observacoes}` : ''}
+
+Obrigado pela preferência! 💅✨
+            `;
+            
+            // Create and download PDF (simplified as text file)
+            const blob = new Blob([pdfContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Recibo-${numero}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Reset form
+            document.getElementById('cupom-form').reset();
+            document.getElementById('cupom-data').value = new Date().toISOString().split('T')[0];
+            updateCupomNumber();
+            updateCupomTotal();
+            
+            alert('Recibo gerado com sucesso!');
+        }
+
+        function enviarReciboWhats() {
+            const cliente = document.getElementById('cupom-cliente').value;
+            const total = document.getElementById('cupom-total').textContent;
+            const pagamento = document.getElementById('cupom-pagamento').value;
+            
+            if (!cliente) {
+                alert('Selecione um cliente');
+                return;
+            }
+            
+            // Get services
+            const servicoSelects = document.querySelectorAll('.cupom-servico');
+            const valorInputs = document.querySelectorAll('.cupom-valor');
+            const servicos = [];
+            
+            servicoSelects.forEach((select, index) => {
+                if (select.value && valorInputs[index].value) {
+                    const serviceName = select.selectedOptions[0].textContent.split(' - ')[0];
+                    servicos.push(`${serviceName} R$ ${parseFloat(valorInputs[index].value).toFixed(2)}`);
+                }
+            });
+            
+            if (servicos.length === 0) {
+                alert('Adicione pelo menos um serviço');
+                return;
+            }
+            
+            // Get client phone from agendamentos
+            const clienteAgendamento = agendamentos.find(a => a.nome === cliente);
+            if (!clienteAgendamento) {
+                alert('Telefone do cliente não encontrado');
+                return;
+            }
+            
+            const message = config.templates.recibo
+                .replace('{nome}', cliente)
+                .replace('{itens}', servicos.join(', '))
+                .replace('{total}', total)
+                .replace('{pagamento}', pagamento);
+            
+            const whatsappUrl = `https://wa.me/55${clienteAgendamento.telefone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Configuration Functions
+        function loadConfiguracoes() {
+            // Load templates
+            document.getElementById('template-confirmacao').value = config.templates.confirmacao;
+            document.getElementById('template-lembrete').value = config.templates.lembrete;
+            document.getElementById('template-cancelamento').value = config.templates.cancelamento;
+            document.getElementById('template-recibo').value = config.templates.recibo;
+            
+            // Load other configs
+            document.getElementById('config-pin').value = ADMIN_PIN;
+            document.getElementById('config-github').value = config.githubUrl;
+        }
+
+        function loadConfigurationsUI() {
+            const container = document.getElementById('horarios-funcionamento');
+            container.innerHTML = '';
+            
+            const dias = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
+            const nomesDias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+            
+            dias.forEach((dia, index) => {
+                const horario = config.horariosFuncionamento[dia];
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-3 gap-2 items-center';
+                row.innerHTML = `
+                    <div class="text-sm font-medium">${nomesDias[index]}</div>
+                    <input type="time" value="${horario.abertura}" class="p-2 border border-gray-300 rounded-lg text-sm" data-dia="${dia}" data-tipo="abertura">
+                    <input type="time" value="${horario.fechamento}" class="p-2 border border-gray-300 rounded-lg text-sm" data-dia="${dia}" data-tipo="fechamento">
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function salvarConfiguracoes() {
+            // Save templates
+            config.templates.confirmacao = document.getElementById('template-confirmacao').value;
+            config.templates.lembrete = document.getElementById('template-lembrete').value;
+            config.templates.cancelamento = document.getElementById('template-cancelamento').value;
+            config.templates.recibo = document.getElementById('template-recibo').value;
+            
+            // Save PIN
+            ADMIN_PIN = document.getElementById('config-pin').value;
+            
+            // Save GitHub URL
+            config.githubUrl = document.getElementById('config-github').value;
+            
+            // Save horários
+            const horarioInputs = document.querySelectorAll('#horarios-funcionamento input');
+            horarioInputs.forEach(input => {
+                const dia = input.dataset.dia;
+                const tipo = input.dataset.tipo;
+                config.horariosFuncionamento[dia][tipo] = input.value;
+            });
+            
+            saveToStorage();
+            alert('Configurações salvas com sucesso!');
+        }
+
+        // Reports Functions
+        function loadRelatorios() {
+            const hoje = new Date().toISOString().split('T')[0];
+            const inicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+            
+            // Caixa hoje
+            const cuponsHoje = cupons.filter(c => c.data === hoje);
+            const totalHoje = cuponsHoje.reduce((sum, c) => sum + c.total, 0);
+            document.getElementById('caixa-hoje').textContent = `R$ ${totalHoje.toFixed(2)}`;
+            
+            // Caixa mês
+            const cupomsMes = cupons.filter(c => c.data >= inicioMes);
+            const totalMes = cupomsMes.reduce((sum, c) => sum + c.total, 0);
+            document.getElementById('caixa-mes').textContent = `R$ ${totalMes.toFixed(2)}`;
+            
+            // Pagamentos hoje
+            const pagamentosHoje = {};
+            cuponsHoje.forEach(c => {
+                pagamentosHoje[c.pagamento] = (pagamentosHoje[c.pagamento] || 0) + c.total;
+            });
+            
+            const pagamentosContainer = document.getElementById('pagamentos-hoje');
+            pagamentosContainer.innerHTML = '';
+            Object.entries(pagamentosHoje).forEach(([forma, valor]) => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between';
+                div.innerHTML = `<span>${forma}:</span><span>R$ ${valor.toFixed(2)}</span>`;
+                pagamentosContainer.appendChild(div);
+            });
+            
+            // Serviços mais realizados
+            const servicosCount = {};
+            const agendamentosMes = agendamentos.filter(a => 
+                a.data >= inicioMes && a.status === 'concluido'
+            );
+            
+            agendamentosMes.forEach(a => {
+                servicosCount[a.servicoNome] = (servicosCount[a.servicoNome] || 0) + 1;
+            });
+            
+            const servicosRanking = document.getElementById('servicos-ranking');
+            servicosRanking.innerHTML = '';
+            Object.entries(servicosCount)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 5)
+                .forEach(([servico, count]) => {
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center p-2 bg-gray-50 rounded-lg';
+                    div.innerHTML = `<span class="text-sm">${servico}</span><span class="font-bold text-pink-600">${count}</span>`;
+                    servicosRanking.appendChild(div);
+                });
+            
+            // Profissionais ranking
+            const profissionaisCount = {};
+            agendamentosMes.forEach(a => {
+                profissionaisCount[a.profissional] = (profissionaisCount[a.profissional] || 0) + 1;
+            });
+            
+            const profissionaisRanking = document.getElementById('profissionais-ranking');
+            profissionaisRanking.innerHTML = '';
+            Object.entries(profissionaisCount)
+                .sort(([,a], [,b]) => b - a)
+                .forEach(([profissional, count]) => {
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center p-2 bg-gray-50 rounded-lg';
+                    div.innerHTML = `<span class="text-sm">${profissional}</span><span class="font-bold text-blue-600">${count}</span>`;
+                    profissionaisRanking.appendChild(div);
+                });
+        }
+
+        // Clients Functions
+        function loadClientes() {
+            const clientesList = document.getElementById('clientes-list');
+            const buscarInput = document.getElementById('buscar-cliente');
+            
+            function renderClientes(filtro = '') {
+                clientesList.innerHTML = '';
+                
+                // Get unique clients with their history
+                const clientesMap = {};
+                agendamentos.forEach(a => {
+                    if (!clientesMap[a.nome]) {
+                        clientesMap[a.nome] = {
+                            nome: a.nome,
+                            telefone: a.telefone,
+                            agendamentos: []
+                        };
+                    }
+                    clientesMap[a.nome].agendamentos.push(a);
+                });
+                
+                Object.values(clientesMap)
+                    .filter(cliente => cliente.nome.toLowerCase().includes(filtro.toLowerCase()))
+                    .sort((a, b) => a.nome.localeCompare(b.nome))
+                    .forEach(cliente => {
+                        const clienteCard = document.createElement('div');
+                        clienteCard.className = 'bg-white p-4 rounded-xl shadow-md';
+                        
+                        const ultimoAgendamento = cliente.agendamentos
+                            .sort((a, b) => new Date(b.data) - new Date(a.data))[0];
+                        
+                        clienteCard.innerHTML = `
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">${cliente.nome}</h4>
+                                    <p class="text-sm text-gray-600">${cliente.telefone}</p>
+                                    <p class="text-xs text-gray-500">${cliente.agendamentos.length} agendamento(s)</p>
+                                </div>
+                                <button onclick="reagendarCliente('${cliente.nome}')" class="bg-pink-500 text-white px-3 py-1 rounded-lg text-sm">
+                                    📅 Reagendar
+                                </button>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <p><strong>Último:</strong> ${ultimoAgendamento.servicoNome}</p>
+                                <p><strong>Data:</strong> ${formatDate(ultimoAgendamento.data)}</p>
+                                <p><strong>Status:</strong> ${ultimoAgendamento.status}</p>
+                            </div>
+                        `;
+                        
+                        clientesList.appendChild(clienteCard);
+                    });
+            }
+            
+            buscarInput.addEventListener('input', (e) => {
+                renderClientes(e.target.value);
+            });
+            
+            renderClientes();
+        }
+
+        function reagendarCliente(nomeCliente) {
+            // Switch to agendar tab and pre-fill client name
+            switchTab('agendar');
+            document.getElementById('nome').value = nomeCliente;
+            
+            // Get client phone from previous appointments
+            const clienteAgendamento = agendamentos.find(a => a.nome === nomeCliente);
+            if (clienteAgendamento) {
+                document.getElementById('telefone').value = clienteAgendamento.telefone;
+            }
+        }
+
+        // Utility Functions
+        function formatDate(dateString) {
+            const date = new Date(dateString + 'T00:00:00');
+            return date.toLocaleDateString('pt-BR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.remove('active');
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a65834e114f1c7',t:'MTc1NzA4MTc4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
