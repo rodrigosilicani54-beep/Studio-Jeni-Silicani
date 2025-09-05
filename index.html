@@ -1715,3 +1715,93 @@ Obrigado pela preferência! 💅✨
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a68102429fc1b6',t:'MTc1NzA4MzQ1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
+
+<!-- FORMULÁRIO DE AGENDAMENTO -->
+<form id="form-agendamento">
+  <label for="nome">Nome Completo *</label>
+  <input type="text" id="nome" name="nome" required>
+
+  <label for="telefone">Telefone *</label>
+  <input type="tel" id="telefone" name="telefone" placeholder="(11) 99999-9999" required>
+
+  <label for="servico">Serviço *</label>
+  <select id="servico" name="servico" required>
+    <option value="">Selecione um serviço</option>
+    <option value="Manicure">Manicure</option>
+    <option value="Pedicure">Pedicure</option>
+    <option value="Cabelo">Cabelo</option>
+    <!-- adicione outros serviços se precisar -->
+  </select>
+
+  <label for="profissional">Profissional (Opcional)</label>
+  <select id="profissional" name="profissional">
+    <option value="">Qualquer profissional</option>
+    <option value="Profissional 1">Profissional 1</option>
+    <option value="Profissional 2">Profissional 2</option>
+    <!-- adicione outros profissionais -->
+  </select>
+
+  <label for="data">Data *</label>
+  <input type="date" id="data" name="data" required>
+
+  <label for="hora">Horário *</label>
+  <input type="time" id="hora" name="hora" required>
+
+  <label for="observacoes">Observações</label>
+  <textarea id="observacoes" name="observacoes" rows="3"></textarea>
+
+  <button type="submit">Solicitar Agendamentos</button>
+</form>
+
+<script>
+  const GITHUB_USER = "rodrigosilicani";
+  const REPO = "studio-jenisilicani";
+  const BRANCH = "main";
+  const TOKEN = "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";
+
+  const AGENDA_URL = `https://api.github.com/repos/${GITHUB_USER}/${REPO}/contents/agenda.json`;
+
+  async function pegarAgenda() {
+    const res = await fetch(AGENDA_URL);
+    const data = await res.json();
+    const agenda = JSON.parse(atob(data.content));
+    return { agenda, sha: data.sha };
+  }
+
+  async function salvarAgendamento(novoAgendamento) {
+    const { agenda, sha } = await pegarAgenda();
+    agenda.push(novoAgendamento);
+    const novoConteudo = btoa(JSON.stringify(agenda, null, 2));
+
+    await fetch(AGENDA_URL, {
+      method: "PUT",
+      headers: {
+        Authorization: `token ${TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "Novo agendamento",
+        content: novoConteudo,
+        sha: sha
+      })
+    });
+    alert("Agendamento salvo com sucesso!");
+  }
+
+  document.querySelector("#form-agendamento").addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const novoAgendamento = {
+      nome: document.querySelector("#nome").value,
+      telefone: document.querySelector("#telefone").value,
+      servico: document.querySelector("#servico").value,
+      profissional: document.querySelector("#profissional").value,
+      data: document.querySelector("#data").value,
+      hora: document.querySelector("#hora").value,
+      observacoes: document.querySelector("#observacoes").value
+    };
+
+    salvarAgendamento(novoAgendamento);
+    e.target.reset();
+  });
+</script>
