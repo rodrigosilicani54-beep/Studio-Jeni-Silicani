@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio de Beleza Jeni $ilicani</title>
+    <title>Jeni $ilicani Studio de Beleza</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -84,8 +84,8 @@
     <header class="gradient-bg text-white p-4 shadow-lg">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-xl font-bold">Studio de Beleza</h1>
-                <p class="text-sm opacity-90">Jeni $ilicani</p>
+                <h1 class="text-xl font-bold">Jeni $ilicani</h1>
+                <p class="text-sm opacity-90">Studio de Beleza</p>
             </div>
             <div class="text-right text-sm">
                 <div id="sync-status" class="mb-1 text-xs opacity-75">
@@ -125,7 +125,7 @@
                 <div class="mt-8 grid grid-cols-1 gap-4">
                     <div class="bg-white p-4 rounded-xl shadow-md">
                         <h3 class="font-semibold text-gray-800 mb-2">🕒 Horário de Funcionamento</h3>
-                        <p class="text-gray-600 text-sm">Segunda a Sábado: 9h às 18h</p>
+                        <p class="text-gray-600 text-sm">Segunda a Sábado: 10h às 18h</p>
                     </div>
                     <div class="bg-white p-4 rounded-xl shadow-md">
                         <h3 class="font-semibold text-gray-800 mb-2">💳 Formas de Pagamento</h3>
@@ -421,7 +421,7 @@
                                 </div>
                                 <div class="bg-green-50 p-3 rounded-lg">
                                     <label class="block text-gray-700 font-medium mb-2">🌐 GitHub Pages URL</label>
-                                    <p class="text-sm text-green-700 font-mono bg-white p-2 rounded border">https://rodrigosilicani54-beep.github.io/Studio-Jeni-Silicani/</p>
+                                    <p class="text-sm text-green-700 font-mono bg-white p-2 rounded border">https://rodrigosilicani54-beep.github.io/Jeni-Silicani-Studio/</p>
                                     <p class="text-xs text-gray-600 mt-1">✅ URL configurada permanentemente</p>
                                 </div>
                             </div>
@@ -586,7 +586,7 @@
         // GitHub Configuration
         const GITHUB_CONFIG = {
             owner: 'rodrigosilicani54-beep',
-            repo: 'Studio-Jeni-Silicani',
+            repo: 'Jeni-Silicani-Studio',
             token: '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',
             branch: 'main'
         };
@@ -625,21 +625,21 @@
         // Configurações padrão
         let config = {
             horariosFuncionamento: {
-                'segunda': { abertura: '09:00', fechamento: '18:00', ativo: true },
-                'terca': { abertura: '09:00', fechamento: '18:00', ativo: true },
-                'quarta': { abertura: '09:00', fechamento: '18:00', ativo: true },
-                'quinta': { abertura: '09:00', fechamento: '18:00', ativo: true },
-                'sexta': { abertura: '09:00', fechamento: '18:00', ativo: true },
-                'sabado': { abertura: '09:00', fechamento: '18:00', ativo: true },
-                'domingo': { abertura: '09:00', fechamento: '18:00', ativo: false }
+                'segunda': { abertura: '10:00', fechamento: '18:00', ativo: true },
+                'terca': { abertura: '10:00', fechamento: '18:00', ativo: true },
+                'quarta': { abertura: '10:00', fechamento: '18:00', ativo: true },
+                'quinta': { abertura: '10:00', fechamento: '18:00', ativo: true },
+                'sexta': { abertura: '10:00', fechamento: '18:00', ativo: true },
+                'sabado': { abertura: '10:00', fechamento: '18:00', ativo: true },
+                'domingo': { abertura: '10:00', fechamento: '18:00', ativo: false }
             },
             templates: {
-                confirmacao: 'Olá {nome}, sua reserva no Studio de Beleza Jeni $ilicani foi confirmada para {data} às {hora}, serviço {servico}, endereço Rua das Graviolas N°350 💇✨',
+                confirmacao: 'Olá {nome}, sua reserva no Jeni $ilicani Studio de Beleza foi confirmada para {data} às {hora}, serviço {servico}, endereço Rua das Graviolas N°350 💇✨',
                 lembrete: '{nome}, lembrete: amanhã às {hora} serviço {servico}. Endereço Rua das Graviolas N°350 📍',
                 cancelamento: 'Oi {nome}, não conseguimos confirmar seu horário {data} {hora}. Vamos achar outro?',
                 recibo: '{nome}, segue seu Recibo Digital: {itens}, total R$ {total} em {pagamento}. Obrigado por escolher o Studio 🙌'
             },
-            githubUrl: 'https://rodrigosilicani54-beep.github.io/Studio-Jeni-Silicani/'
+            githubUrl: 'https://rodrigosilicani54-beep.github.io/Jeni-Silicani-Studio/'
         };
 
         // GitHub Sync Functions
@@ -1133,9 +1133,7 @@
             }
             
             const availableHours = [
-                '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-                '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
-                '16:00', '16:30', '17:00', '17:30'
+                '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'
             ];
             
             // Filter out booked hours
@@ -1180,7 +1178,7 @@
         function enviarNotificacaoStudio(agendamento) {
             const studioPhone = '5511945106374'; // Studio WhatsApp number
             
-            const message = `🔔 NOVO AGENDAMENTO RECEBIDO!
+            const message = `🔔 NOVO AGENDAMENTO RECEBIDO - JENI $ILICANI STUDIO!
 
 👤 Cliente: ${agendamento.nome}
 📱 Telefone: ${agendamento.telefone}
@@ -1624,7 +1622,7 @@ Status: ${agendamento.status === 'pendente' ? '⏳ PENDENTE DE CONFIRMAÇÃO' : 
             // Header
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
-            doc.text('STUDIO DE BELEZA JENI $ILICANI', 105, 20, { align: 'center' });
+            doc.text('JENI $ILICANI STUDIO DE BELEZA', 105, 20, { align: 'center' });
             
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
@@ -1709,7 +1707,7 @@ Status: ${agendamento.status === 'pendente' ? '⏳ PENDENTE DE CONFIRMAÇÃO' : 
             
             const servicosTexto = cupom.servicos.map(s => `${s.nome} R$ ${s.valor.toFixed(2)}`).join(', ');
             
-            const message = `🧾 *RECIBO DIGITAL - STUDIO JENI $ILICANI*
+            const message = `🧾 *RECIBO DIGITAL - JENI $ILICANI STUDIO*
 
 👤 Cliente: ${cupom.cliente}
 📅 Data: ${formatDate(cupom.data)}
@@ -2028,5 +2026,5 @@ _O PDF do recibo foi baixado no seu dispositivo_`;
             document.getElementById('success-modal').classList.remove('active');
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97a6fe65905bc1b6',t:'MTc1NzA4ODU5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97aa56b765e0f1c7',t:'MTc1NzEyMzY2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
